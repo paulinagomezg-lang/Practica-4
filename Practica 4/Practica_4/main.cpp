@@ -1,7 +1,31 @@
 #include <iostream>
 #include <stdexcept>
+#include <string>
+#include <sstream>
 #include "Red.h"
+#include "LectorTopologia.h"
 using namespace std;
+
+// Lee un entero sin que el programa se caiga si el usuario escribe letras
+int Leer_Entero(const string &Mensaje){
+    while (true){
+        cout << Mensaje;
+        string Texto;
+        if (!getline(cin, Texto)) return 0;   // se acabo la entrada: sale del menu
+        istringstream Flujo(Texto);
+        int Valor;
+        char Resto;
+        if ((Flujo >> Valor) && !(Flujo >> Resto)) return Valor;
+        cout << "Ingrese un numero entero valido." << endl;
+    }
+}
+
+string Leer_Texto(const string &Mensaje){
+    cout << Mensaje;
+    string Texto;
+    getline(cin, Texto);
+    return Texto;   // si se acabo la entrada queda vacio
+}
 
 void Mostrar_Camino(const Red &R, const string &Origen, const string &Destino){
     list<string> Camino = R.Encontrar_Camino(Origen, Destino);
@@ -15,61 +39,69 @@ void Mostrar_Camino(const Red &R, const string &Origen, const string &Destino){
     cout << "   (costo " << R.Costo_Camino(Origen, Destino) << ")" << endl;
 }
 
-int main(){
-    try {
-        Red R;
-        R.Agregar_un_Enrutador("A");
-        R.Agregar_un_Enrutador("B");
-        R.Agregar_un_Enrutador("C");
-        R.Agregar_un_Enrutador("D");
+void Mostrar_Menu(){
+    cout << " SIMULADOR DE RED DE ENRUTADORES ;3" << endl;
+    cout << "1. Cargar la red desde un archivo .txt" << endl;
+    cout << "2. Agregar un enrutador" << endl;
+    cout << "3. Eliminar un enrutador" << endl;
+    cout << "4. Agregar un enlace" << endl;
+    cout << "5. Eliminar un enlace" << endl;
+    cout << "6. Camino y costo entre dos enrutadores" << endl;
+    cout << "7. Imprimir la red" << endl;
+    cout << "8. Imprimir las tablas de costos" << endl;
+    cout << "0. Salir" << endl;
+}
 
-        // Topologia de la Figura 1 del PDF
-        R.Agregar_un_Enlace("A", "B", 4);
-        R.Agregar_un_Enlace("A", "C", 10);
-        R.Agregar_un_Enlace("A", "D", 5);
-        R.Agregar_un_Enlace("B", "C", 3);
-        R.Agregar_un_Enlace("B", "D", 1);
-        R.Agregar_un_Enlace("D", "C", 2);
+int main(int argc, char *argv[]){
+    Red R;
+    Lectortopologia Lector(R);
 
-        R.Imprimir_Red();
-        cout << endl;
-        R.Imprimir_Tablas();
-        cout << endl;
-
-        Mostrar_Camino(R, "A", "C");
-        Mostrar_Camino(R, "A", "D");
-        Mostrar_Camino(R, "C", "A");
-
-        cout << "\n--- Elimino los enlaces A-B y A-D: A queda solo con C (costo 10) ---" << endl;
-        R.Eliminar_un_Enlace("A", "B");
-        R.Eliminar_un_Enlace("A", "D");
-        Mostrar_Camino(R, "A", "B");
-
-        cout << "\n--- Agrego enrutador E sin enlaces ---" << endl;
-        R.Agregar_un_Enrutador("E");
+    // Si se pasa el archivo como argumento, se carga de una vez
+    if (argc > 1){
         try {
-            Mostrar_Camino(R, "A", "E");
+            Lector.Cargar(argv[1]);
+            cout << "Red cargada desde " << argv[1] << endl;
         } catch (const exception &e){
-            cout << "Error esperado: " << e.what() << endl;
+            cout << "Error: " << e.what() << endl;
         }
-
-        cout << "\n--- Elimino el enrutador C ---" << endl;
-        R.Eliminar_el_Enrutador("C");
-        R.Imprimir_Red();
-        try {
-            Mostrar_Camino(R, "A", "B");
-        } catch (const exception &e){
-            cout << "Error esperado: " << e.what() << endl;
-        }
-        Mostrar_Camino(R, "B", "D");
-
-        cout << "\n--- Errores controlados ---" << endl;
-        try { R.Agregar_un_Enrutador("A"); } catch (const exception &e){ cout << e.what() << endl; }
-        try { R.Agregar_un_Enlace("A", "Z", 3); } catch (const exception &e){ cout << e.what() << endl; }
-        try { R.Agregar_un_Enlace("A", "A", 3); } catch (const exception &e){ cout << e.what() << endl; }
-        try { R.Agregar_un_Enlace("A", "B", -2); } catch (const exception &e){ cout << e.what() << endl; }
-    } catch (const exception &e){
-        cout << "Error: " << e.what() << endl;
     }
+
+    int Opcion = -1;
+    while (Opcion != 0 && cin){
+        Mostrar_Menu();
+        Opcion = Leer_Entero("Opcion: ");
+        try {
+            if (Opcion == 1){
+                Lector.Cargar(Leer_Texto("Ruta del archivo: "));
+                cout << "Red cargada." << endl;
+            } else if (Opcion == 2){
+                R.Agregar_un_Enrutador(Leer_Texto("Nombre del enrutador: "));
+            } else if (Opcion == 3){
+                R.Eliminar_el_Enrutador(Leer_Texto("Nombre del enrutador a eliminar: "));
+            } else if (Opcion == 4){
+                string A = Leer_Texto("Enrutador A: ");
+                string B = Leer_Texto("Enrutador B: ");
+                int Costo = Leer_Entero("Costo del enlace: ");
+                R.Agregar_un_Enlace(A, B, Costo);
+            } else if (Opcion == 5){
+                string A = Leer_Texto("Enrutador A: ");
+                string B = Leer_Texto("Enrutador B: ");
+                R.Eliminar_un_Enlace(A, B);
+            } else if (Opcion == 6){
+                string Origen = Leer_Texto("Origen: ");
+                string Destino = Leer_Texto("Destino: ");
+                Mostrar_Camino(R, Origen, Destino);
+            } else if (Opcion == 7){
+                R.Imprimir_Red();
+            } else if (Opcion == 8){
+                R.Imprimir_Tablas();
+            } else if (Opcion != 0){
+                cout << "Opcion no valida." << endl;
+            }
+        } catch (const exception &e){
+            cout << "Error: " << e.what() << endl;
+        }
+    }
+    cout << "Hasta luego." << endl;
     return 0;
 }

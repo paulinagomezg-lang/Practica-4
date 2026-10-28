@@ -13,7 +13,7 @@ private:
 
 public:
     Enrutador();
-    Enrutador(const string &NombreEnrutador);
+    Enrutador(const string &NombreEnrutador); //que sea uno
 
     //Manejo de los vecinos directos
     void AgregarVecino(const string &Destino, int Costo);
