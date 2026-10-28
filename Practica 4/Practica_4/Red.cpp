@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <queue>
-#include <vector>
+#include <vector> //en donde lo vemos
 #include <limits>
 #include "Red.h"
 using namespace std;
@@ -64,12 +64,12 @@ void Red::Calcular_Tabla(const string &Origen){
     map<string, string> Anterior;
 
     //(Distancia, nombre): el menor se extrae primero
-    priority_queue<pair<int, string>, vector<pair<int, string>>, greater<pair<int, string>>> Cola;
+    priority_queue<pair<int, string>, vector<pair<int, string>>, greater<pair<int, string>>> Cola;//******
     Distancia[Origen] = 0;
     Cola.push(make_pair(0, Origen));
 
     while (!Cola.empty()){
-        pair<int, string> Actual = Cola.top();
+        pair<int, string> Actual = Cola.top(); //top ,pop,cola**
         Cola.pop();
         int D = Actual.first;
         string Nodo = Actual.second;
@@ -114,21 +114,21 @@ list<string> Red::Encontrar_Camino(const string &Origen, const string &Destino) 
         throw out_of_range("No existe el enrutador de destino: " + Destino);
     }
 
-    list<string> Camino;
+    list<string> Camino; //Aquí creamos una lista llamada Camino.
     if (Origen == Destino){
-        Camino.push_back(Origen);
+        Camino.push_back(Origen); //agrega elemento al final de la lista
         return Camino;
     }
-    if (!Enrutadores.at(Origen).Conoce_Destino(Destino)){
+    if (!Enrutadores.at(Origen).Conoce_Destino(Destino)){ //Enrutadores.at(Origen) obtiene el objeto Enrutador correspondiente al origen.
         throw out_of_range("No hay camino entre " + Origen + " y " + Destino);
     }
 
     string Actual = Origen;
     while (Actual != Destino){
         Camino.push_back(Actual);
-        Actual = Enrutadores.at(Actual).getSiguiente_Salto(Destino);
+        Actual = Enrutadores.at(Actual).getSiguiente_Salto(Destino); //Desde el enrutador donde estoy, dime cuál es el siguiente enrutador que debo tomar para llegar al destino
     }
-    Camino.push_back(Destino);
+    Camino.push_back(Destino);//Agregamos el enrutador actual a la lista.
     return Camino;
 }
 
@@ -142,7 +142,7 @@ int Red::Costo_Camino(const string &Origen, const string &Destino) const{
 void Red::Imprimir_Red() const{
     cout<< "RED ACTUAL:" <<endl;
     for (const auto &par : Enrutadores){
-        cout<<" "<<par.first<<" -> Vecinos: ";
+        cout<<" "<<par.first<<" -> Vecinos: ";//par.first contiene la clave del mapa, que en este caso es el nombre del enrutador.
         for (const auto &v : par.second.getVecinos()){
             cout<< v.first<<"(" << v.second <<") ";
         }

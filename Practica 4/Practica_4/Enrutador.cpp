@@ -60,11 +60,11 @@ int Enrutador::getCosto(const string &Destino) const{
 }
 
 string Enrutador::getSiguiente_Salto(const string &Destino) const{
-    auto it = Siguiente_Salto.find(Destino);
+    auto it = Siguiente_Salto.find(Destino);//mire esta variable y asignela it
     if (it == Siguiente_Salto.end()){
         throw out_of_range("No hay siguiente salto conocido al camino:" + Destino);
     }
-    return it->second;
+    return it->second; //segunda parte de esas dos cosas
 }
 
 bool Enrutador::Conoce_Destino(const string &Destino) const{
@@ -73,10 +73,10 @@ bool Enrutador::Conoce_Destino(const string &Destino) const{
 
 void Enrutador::ImprimirTabla() const{
     cout <<"TABLA DE COSTOS "<< Nombre<<" : "<<endl;
-    for (const auto &par : TablaCostos){
+    for (const auto &par : TablaCostos){ //par es una direccion de memoria de lo que hay en el mapa(tipo de dato)
         cout <<" -> " <<par.first<<" : Costo "<<par.second;
         if (Siguiente_Salto.find(par.first) != Siguiente_Salto.end() && par.first != Nombre){
-            cout<< " (Via "<<Siguiente_Salto.at(par.first)<< ")";
+            cout<< " (Via "<<Siguiente_Salto.at(par.first)<< ")"; //dame valor de esta clave o sino dame un error
         }
         cout << endl;
     }

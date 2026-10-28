@@ -8,10 +8,11 @@ using namespace std;
 
 class Red
 {
-public:
+private:
+    map<string, Enrutador> Enrutadores; //nombre -> enrutador
+
     //Dijkstra desde el "Origen" solo usa informacion de vecinos de cada enrutador.
     void Calcular_Tabla(const string &Origen);
-    map<string, Enrutador> Enrutadores; //nombre -> enrutador
 
 public:
     Red();
