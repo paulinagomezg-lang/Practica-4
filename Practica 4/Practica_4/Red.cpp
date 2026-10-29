@@ -71,30 +71,30 @@ void Red::Calcular_Tabla(const string &Origen){
     while (!Cola.empty()){
         pair<int, string> Actual = Cola.top(); //top ,pop,cola**
         Cola.pop();
-        int D = Actual.first;
-        string Nodo = Actual.second;
+        int D = Actual.first; //la distacia
+        string Nodo = Actual.second; //el nombre del enrutador
 
         if (D > Distancia[Nodo]) continue;  //entrada vieja de la cola, se ignora
         const map<string, int> &Vecinos = Enrutadores.at(Nodo).getVecinos();
-        for (const auto &v : Vecinos){
+        for (const auto &v : Vecinos){//vecinos =Los enlaces directos del nodo actual y su costo
             int Nueva = D + v.second;
             auto it = Distancia.find(v.first);
             if (it == Distancia.end() || Nueva < it->second){
-                Distancia[v.first] = Nueva;
-                Anterior[v.first] = Nodo;
+                Distancia[v.first] = Nueva;//distancia= Mejor distancia conocida desde el origen hasta cada enrutador
+                Anterior[v.first] = Nodo; //anterior=Para cada enrutador, desde cuál se llegó a él por el mejor camino
                 Cola.push(make_pair(Nueva, v.first));
             }
         }
     }
     //Siguiente salto: Retrocedemos por anterior hasta el vecino directo del origen
-    map<string, string>Saltos;
-    for (const auto &par : Distancia){
+    map<string, string>Saltos; //se guarda el vecino directo por donde hay que salir.
+    for (const auto &par : Distancia){ //Recorre todos los destinos alcanzados. par.first es el nombre del destino.
         if (par.first == Origen) continue;
-        string Nodo = par.first;
+        string Nodo = par.first;//Empieza parado en el destino.
         while (Anterior[Nodo] != Origen){
-            Nodo = Anterior[Nodo];
+            Nodo = Anterior[Nodo]; //Nodo es el vecino directo del origen por donde hay que salir.
         }
-        Saltos[par.first] = Nodo;
+        Saltos[par.first] = Nodo;//Guarda: “para llegar a este destino, sal por Nodo
     }
     Enrutadores[Origen].Actualizar_Tabla_Costos(Distancia);
     Enrutadores[Origen].Actualizar_Siguiente_Salto(Saltos);
